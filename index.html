@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASHLY • Domain</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    .logo-header {
+      font-size: 2.8rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #a855f7, #eab308);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .hero-bg {
+      background-image: linear-gradient(rgba(0,0,0,0.65), rgba(75,0,130,0.75)),
+                        url('pic3');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .tag {
+      display: inline-block;
+      background: #6b21a8;
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      margin: 2px;
+    }
+
+    @keyframes goldPurpleGlow {
+      0%, 100% { text-shadow: 0 0 20px rgba(168, 85, 247, 0.6), 0 0 40px rgba(234, 179, 8, 0.3); }
+      50% { text-shadow: 0 0 40px rgba(168, 85, 247, 0.9), 0 0 60px rgba(234, 179, 8, 0.6); }
+    }
+    .master-glow {
+      animation: goldPurpleGlow 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-black text-white" onload="checkAuth()">
+
+  <div id="masterWelcomeScreen" class="hidden fixed inset-0 bg-black z-[500] flex flex-col items-center justify-center transition-opacity duration-1000 opacity-100">
+    <div class="text-center space-y-4 px-6">
+      <h1 class="text-6xl md:text-7xl font-black tracking-widest bg-gradient-to-r from-purple-500 via-amber-400 to-purple-600 bg-clip-text text-transparent master-glow uppercase">
+        Welcome, Ashly
+      </h1>
+      <p class="text-zinc-500 tracking-widest text-sm uppercase font-semibold">Your domain awaits your command</p>
+      <div class="pt-6">
+        <div class="w-12 h-1 border-t-2 border-amber-500 mx-auto rounded animate-pulse"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loginModal" class="fixed inset-0 bg-black/95 z-[400] flex items-center justify-center">
+    <div class="bg-zinc-900 rounded-3xl w-full max-w-md mx-4 p-10 border border-purple-700">
+      <h1 class="text-4xl font-black text-center mb-8 text-purple-400">ASHLY'S DOMAIN</h1>
+      <div class="space-y-6">
+        <input id="username" type="text" placeholder="Username" 
+               class="w-full bg-zinc-800 border border-purple-600 rounded-2xl px-6 py-4 focus:outline-none focus:border-purple-500">
+        <input id="password" type="password" placeholder="Password" 
+               class="w-full bg-zinc-800 border border-purple-600 rounded-2xl px-6 py-4 focus:outline-none focus:border-purple-500">
+        
+        <button onclick="login()" 
+                class="w-full py-5 bg-gradient-to-r from-purple-600 to-amber-500 text-black font-bold rounded-2xl hover:opacity-90 transition">
+          ENTER THE DOMAIN
+        </button>
+
+        <p class="text-center text-xs text-gray-500 mt-4">
+          Admin Gateways: Use <span class="text-purple-400 font-mono font-bold">admin+ashly</span> or <span class="text-amber-400 font-mono font-bold">ashly</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div id="roleModal" class="hidden fixed inset-0 bg-black/95 z-[200] flex items-center justify-center">
+    <div class="text-center max-w-md px-8 w-full">
+      <h1 class="text-5xl font-black mb-8 text-purple-400">ASHLY'S DOMAIN</h1>
+      <p class="text-2xl mb-10">Are you a Sub or a Dom?</p>
+      <div class="grid grid-cols-2 gap-6">
+        <button onclick="selectRole('sub')" class="py-8 bg-gradient-to-b from-purple-700 to-purple-900 hover:from-purple-600 rounded-3xl text-2xl font-bold transition duration-300 transform hover:scale-105 cursor-pointer">
+          SUB
+        </button>
+        <button onclick="selectRole('dom')" class="py-8 bg-cover bg-center rounded-3xl text-2xl font-bold transition duration-300 transform hover:scale-105 border border-zinc-700 hover:border-purple-500 shadow-xl cursor-pointer">
+          DOM
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="domRejection" class="hidden fixed inset-0 z-[300] flex items-center justify-center bg-cover bg-center"
+       style="background-image: linear-gradient(rgba(0,0,0,0.88), rgba(153,0,0,0.75)), url('denied.jpg');">
+    <div class="text-center max-w-lg px-8">
+      <h2 class="text-6xl font-black text-red-500 mb-6">NO DOMS ALLOWED</h2>
+      <p class="text-3xl mb-8 text-red-300">Aside from Ashly...</p>
+      <p class="text-5xl font-bold text-yellow-400 mb-12">"You Cuck"</p>
+      <button onclick="backToRole()" class="mt-8 px-12 py-5 border-2 border-red-500/70 hover:bg-red-500/20 rounded-full text-xl font-semibold transition cursor-pointer">
+        Go Back
+      </button>
+    </div>
+  </div>
+
+  <div id="mainSite" class="hidden">
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-lg border-b border-purple-900 py-6">
+      <div class="max-w-screen-2xl mx-auto px-8 flex items-center justify-between">
+        <a href="https://x.com/hedonistultm" target="_blank" class="flex items-center gap-3 hover:opacity-80 transition">
+          <h1 class="logo-header">ASHLY</h1>
+          <i class="fa-brands fa-x-twitter text-3xl"></i>
+        </a>
+        
+        <div class="flex items-center gap-4">
+          <button onclick="showFavorites()" class="px-6 py-3 bg-zinc-900 hover:bg-zinc-800 rounded-full flex items-center gap-2 cursor-pointer transition">
+            <i class="fa-solid fa-star text-yellow-400"></i>
+            <span>Favorites</span>
+          </button>
+
+          <button onclick="showUploadModal()" class="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-amber-500 text-black font-bold rounded-full cursor-pointer hover:opacity-90 transition">
+            <i class="fa-solid fa-plus"></i>
+            <span>UPLOAD PROPAGANDA</span>
+          </button>
+
+          <button onclick="logout()" class="px-5 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-full cursor-pointer transition">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero-bg h-screen flex items-center relative pt-20">
+      <div class="max-w-screen-2xl mx-auto px-8 text-center w-full">
+        <h2 class="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-wider max-w-5xl mx-auto">
+          ABANDON ALL HOPE<br>YEE WHO ENTERS HERE
+        </h2>
+      </div>
+    </section>
+
+    <div class="max-w-screen-2xl mx-auto px-8 py-6 border-b border-purple-900">
+      <input id="searchInput" type="text" oninput="renderGallery(1)" placeholder="Search tags or description (e.g. anal, public, collar)..."
+             class="w-full bg-zinc-900 border border-purple-700 rounded-2xl px-6 py-4 focus:outline-none focus:border-purple-500 text-white">
+    </div>
+
+    <div class="max-w-screen-2xl mx-auto px-8 py-12">
+      <h3 class="text-4xl font-bold mb-8 flex items-center gap-3">
+        Public Gallery
+        <span id="resultCount" class="text-sm font-normal text-purple-400"></span>
+      </h3>
+      <div id="gallery" class="gallery-grid"></div>
+      <div class="flex justify-center gap-4 mt-12" id="pagination"></div>
+    </div>
+  </div>
+
+  <div id="uploadModal" class="hidden fixed inset-0 bg-black/95 z-[100] items-center justify-center">
+    <div class="bg-zinc-900/90 rounded-3xl w-full max-w-xl mx-4 p-8 border border-purple-700/40 shadow-2xl backdrop-blur-xl">
+      <h2 class="text-3xl font-black mb-6 text-purple-400">Upload Propaganda Media</h2>
+      
+      <div class="space-y-5">
+        <div>
+          <label class="block text-xs font-bold text-purple-400 mb-2 uppercase tracking-wide">Choose Local Media File</label>
+          <input id="uploadFile" type="file" accept="image/*,video/*" 
+                 class="w-full bg-zinc-950 border border-purple-700/80 rounded-2xl px-5 py-4 text-sm focus:outline-none text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-purple-600 file:text-black hover:file:bg-purple-500 cursor-pointer transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-purple-400 mb-2 uppercase tracking-wide">Description</label>
+          <textarea id="uploadDesc" rows="3" placeholder="Description..." 
+                    class="w-full bg-zinc-950 border border-purple-700/80 rounded-2xl px-5 py-4 focus:outline-none focus:border-purple-500 text-white resize-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-purple-400 mb-2 uppercase tracking-wide">Tags</label>
+          <input id="uploadTags" type="text" placeholder="Tags (comma separated) e.g. anal, leash, public" 
+                 class="w-full bg-zinc-950 border border-purple-700/80 rounded-2xl px-5 py-4 focus:outline-none focus:border-purple-500 text-white">
+        </div>
+
+        <div class="flex gap-6 pt-2 items-center">
+          <label class="flex items-center gap-2 cursor-pointer font-medium text-sm text-gray-200">
+            <input type="radio" name="visibility" value="public" checked class="accent-purple-500 w-4 h-4">
+            Public
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer font-medium text-sm text-gray-400">
+            <input type="radio" name="visibility" value="restricted" class="accent-purple-500 w-4 h-4">
+            Restricted (private)
+          </label>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 pt-4">
+          <button onclick="hideUploadModal()" 
+                  class="py-4 border border-zinc-700 hover:bg-zinc-800 rounded-2xl font-bold transition text-gray-300">
+            Cancel
+          </button>
+          <button onclick="handleFormUpload()" 
+                  class="py-4 bg-gradient-to-r from-purple-600 to-amber-500 text-black font-black rounded-2xl hover:opacity-90 transition shadow-lg">
+            Upload
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="postModal" class="hidden fixed inset-0 bg-black/95 z-[150] items-center justify-center overflow-y-auto p-4">
+    <div class="bg-zinc-900 rounded-3xl w-full max-w-3xl my-8 border border-purple-900/40">
+      <div class="p-6 border-b border-purple-900 flex justify-between items-center">
+        <h3 class="text-xl font-bold" id="modalTitle">Post Container</h3>
+        <button onclick="closePostModal()" class="text-3xl hover:text-red-500 font-semibold cursor-pointer transition">×</button>
+      </div>
+      
+      <div id="modalMedia" class="p-6 flex justify-center bg-black/40"></div>
+      <div class="p-6 border-t border-purple-900">
+        <div class="flex gap-6 text-2xl mb-6">
+          <button onclick="toggleLike()" id="likeBtn" class="flex items-center gap-2 hover:text-red-500 transition cursor-pointer">
+            <i class="fa-solid fa-heart text-red-500"></i> <span id="likeCount">0</span>
+          </button>
+          <button onclick="toggleFavorite()" id="favBtn" class="flex items-center gap-2 hover:text-yellow-400 transition cursor-pointer">
+            <i id="favIcon" class="fa-solid fa-star"></i>
+          </button>
+        </div>
+        <div class="mb-6">
+          <p class="text-purple-400 text-sm mb-2 font-semibold">TAGS</p>
+          <div id="modalTagsContainer" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div>
+          <p class="text-purple-400 text-sm mb-3 font-semibold">COMMENTS</p>
+          <div id="commentsSection" class="max-h-60 overflow-y-auto space-y-4 mb-6 pr-2"></div>
+          
+          <div class="flex gap-3">
+            <input id="commentInput" type="text" placeholder="Write a comment..."
+                   class="flex-1 bg-zinc-800 border border-purple-700 rounded-2xl px-5 py-3 focus:outline-none focus:border-purple-500 text-white">
+            <button onclick="addComment()" class="px-8 bg-purple-600 hover:bg-purple-500 rounded-2xl font-bold transition cursor-pointer">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+
+    function triggerMasterWelcome() {
+      const welcomeScreen = document.getElementById('masterWelcomeScreen');
+      welcomeScreen.classList.remove('hidden');
+      welcomeScreen.style.opacity = '1';
+
+      setTimeout(() => {
+        welcomeScreen.style.opacity = '0';
+        setTimeout(() => {
+          welcomeScreen.classList.add('hidden');
+        }, 1000);
+      }, 3000);
+    }
+
+    function login() {
+      const username = document.getElementById('username').value.trim().toLowerCase();
+      const password = document.getElementById('password').value.trim();
+
+      if (username === "admin+ashly" || username === "ashly" || username === "admin") {
+        currentUser = { role: 'admin', username: username };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        document.getElementById('loginModal').classList.add('hidden');
+        
+        triggerMasterWelcome();
+        
+        document.getElementById('mainSite').classList.remove('hidden');
+        initDatabase();
+      } else if (username && password) {
+        currentUser = { role: 'sub', username: username };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        document.getElementById('loginModal').classList.add('hidden');
+        document.getElementById('roleModal').classList.remove('hidden');
+      } else {
+        alert("Please provide valid login inputs.");
+      }
+    }
+
+    function isAdmin() {
+      return currentUser && currentUser.role === 'admin';
+    }
+
+    function logout() {
+      if (confirm("Disconnect session from the gateway?")) {
+        localStorage.removeItem('currentUser');
+        location.reload();
+      }
+    }
+
+    function checkAuth() {
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        document.getElementById('loginModal').classList.add('hidden');
+        if (currentUser.role === 'admin') {
+          document.getElementById('mainSite').classList.remove('hidden');
+          initDatabase();
+        } else {
+          document.getElementById('roleModal').classList.remove('hidden');
+        }
+      }
+    }
+
+    const BASE_UPLOADS = [
+      { id: 1, url: "image1.jpg", desc: "Welcome to the domain entry point.", tags: ["public", "main"], likes: 45, comments: [{id: 101, text: "Stunning welcome.", author: "sub", upvotes: 5, downvotes: 0}] },
+      { id: 2, url: "image2.jpg", desc: "Private access point view.", tags: ["domain", "restricted"], likes: 32, comments: [] },
+      { id: 3, url: "image3.jpg", desc: "Propaganda media item #3", tags: ["public"], likes: 12, comments: [] },
+      { id: 4, url: "image4.jpg", desc: "Propaganda media item #4", tags: ["leash"], likes: 18, comments: [] },
+      { id: 5, url: "image5.jpg", desc: "Propaganda media item #5", tags: ["collar"], likes: 24, comments: [] }
+    ];
+
+    let db = null;
+    let CUSTOM_UPLOADS = [];
+    let ALL_MEDIA_REGISTRY = [];
+    let BASE_MODIFICATIONS = JSON.parse(localStorage.getItem('baseMediaModifications')) || null;
+
+    function initDatabase() {
+      const request = indexedDB.open("AshlyDomainDB", 1);
+      
+      request.onupgradeneeded = function(e) {
+        let database = e.target.result;
+        if (!database.objectStoreNames.contains("uploads")) {
+          database.createObjectStore("uploads", { keyPath: "id" });
+        }
+      };
+
+      request.onsuccess = function(e) {
+        db = e.target.result;
+        loadCustomUploadsFromDB();
+      };
+
+      request.onerror = function() {
+        console.error("IndexedDB blocked or unavailable. Reverting to memory arrays.");
+        updateMasterRegistry();
+        renderGallery();
+      };
+    }
+
+    function loadCustomUploadsFromDB() {
+      if (!db) return;
+      const transaction = db.transaction("uploads", "readonly");
+      const store = transaction.objectStore("uploads");
+      const getAllRequest = store.getAll();
+
+      getAllRequest.onsuccess = function() {
+        CUSTOM_UPLOADS = getAllRequest.result || [];
+        updateMasterRegistry();
+        renderGallery();
+      };
+    }
+
+    function updateMasterRegistry() {
+      const baseToUse = BASE_MODIFICATIONS ? BASE_MODIFICATIONS : JSON.parse(JSON.stringify(BASE_UPLOADS));
+      ALL_MEDIA_REGISTRY = [...baseToUse, ...CUSTOM_UPLOADS];
+    }
+
+    function savePostState(updatedItem) {
+      const isCustom = CUSTOM_UPLOADS.some(u => u.id === updatedItem.id);
+      if (isCustom) {
+        CUSTOM_UPLOADS = CUSTOM_UPLOADS.map(u => u.id === updatedItem.id ? updatedItem : u);
+        if (db) {
+          const tx = db.transaction("uploads", "readwrite");
+          tx.objectStore("uploads").put(updatedItem);
+        }
+      } else {
+        if (!BASE_MODIFICATIONS) {
+          BASE_MODIFICATIONS = JSON.parse(JSON.stringify(BASE_UPLOADS));
+        }
+        BASE_MODIFICATIONS = BASE_MODIFICATIONS.map(u => u.id === updatedItem.id ? updatedItem : u);
+        localStorage.setItem('baseMediaModifications', JSON.stringify(BASE_MODIFICATIONS));
+      }
+      updateMasterRegistry();
+    }
+
+    let currentPostId = null;
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    let viewingFavorites = false;
+    const itemsPerPage = 20;
+
+    function selectRole(role) {
+      if (role === 'sub') {
+        document.getElementById('roleModal').classList.add('hidden');
+        document.getElementById('mainSite').classList.remove('hidden');
+        initDatabase();
+      } else {
+        document.getElementById('roleModal').classList.add('hidden');
+        document.getElementById('domRejection').classList.remove('hidden');
+      }
+    }
+
+    function backToRole() {
+      document.getElementById('domRejection').classList.add('hidden');
+      document.getElementById('roleModal').classList.remove('hidden');
+    }
+
+    window.showUploadModal = function() {
+      document.getElementById('uploadModal').classList.remove('hidden');
+      document.getElementById('uploadModal').classList.add('flex');
+    }
+
+    window.hideUploadModal = function() {
+      document.getElementById('uploadModal').classList.add('hidden');
+      document.getElementById('uploadModal').classList.remove('flex');
+      document.getElementById('uploadFile').value = '';
+      document.getElementById('uploadDesc').value = '';
+      document.getElementById('uploadTags').value = '';
+    }
+
+    function handleFormUpload() {
+      const fileInput = document.getElementById('uploadFile');
+      const descInput = document.getElementById('uploadDesc').value.trim();
+      const tagsInput = document.getElementById('uploadTags').value.trim();
+      
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Please select a file to execute upload sequence.");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const base64String = e.target.result;
+        const cleanTags = tagsInput ? tagsInput.split(',').map(t => t.trim().toLowerCase()).filter(t => t !== "") : ["public"];
+
+        const newPostObject = {
+          id: Date.now(),
+          url: base64String,
+          desc: descInput || "Custom Local Upload",
+          tags: cleanTags,
+          likes: 0,
+          comments: []
+        };
+
+        CUSTOM_UPLOADS.push(newPostObject);
+        
+        if (db) {
+          const tx = db.transaction("uploads", "readwrite");
+          tx.objectStore("uploads").add(newPostObject);
+          tx.oncomplete = function() {
+            executeUIRefresh();
+          };
+          tx.onerror = function() {
+            console.warn("Database storage write error. Falling back onto runtime memory allocation.");
+            executeUIRefresh();
+          };
+        } else {
+          executeUIRefresh();
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function executeUIRefresh() {
+      updateMasterRegistry();
+      hideUploadModal();
+      if (document.getElementById('searchInput')) {
+        document.getElementById('searchInput').value = "";
+      }
+      renderGallery(1);
+    }
+
+    function deletePost(id, event) {
+      if (event) event.stopPropagation();
+      if (!confirm("Are you sure you want to delete this post from memory?")) return;
+
+      const isCustom = CUSTOM_UPLOADS.some(u => u.id === id);
+      if (isCustom) {
+        CUSTOM_UPLOADS = CUSTOM_UPLOADS.filter(u => u.id !== id);
+        if (db) {
+          const tx = db.transaction("uploads", "readwrite");
+          tx.objectStore("uploads").delete(id);
+        }
+      } else {
+        if (!BASE_MODIFICATIONS) {
+          BASE_MODIFICATIONS = JSON.parse(JSON.stringify(BASE_UPLOADS));
+        }
+        BASE_MODIFICATIONS = BASE_MODIFICATIONS.filter(u => u.id !== id);
+        localStorage.setItem('baseMediaModifications', JSON.stringify(BASE_MODIFICATIONS));
+      }
+
+      favorites = favorites.filter(favId => favId !== id);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+
+      updateMasterRegistry();
+      renderGallery(1);
+      
+      if (currentPostId === id) {
+        closePostModal();
+      }
+    }
+
+    function showFavorites() {
+      viewingFavorites = !viewingFavorites;
+      const favBtn = document.querySelector('[onclick="showFavorites()"]');
+      if (viewingFavorites) {
+        favBtn.classList.add('bg-purple-900', 'border', 'border-purple-500');
+      } else {
+        favBtn.classList.remove('bg-purple-900', 'border', 'border-purple-500');
+      }
+      renderGallery(1);
+    }
+
+    function renderGallery(page = 1) {
+      const gallery = document.getElementById('gallery');
+      if (!gallery) return;
+      gallery.innerHTML = '';
+      
+      const searchInputEl = document.getElementById('searchInput');
+      const searchTerm = searchInputEl ? searchInputEl.value.toLowerCase().trim() : '';
+
+      let items = [...ALL_MEDIA_REGISTRY].reverse();
+
+      if (viewingFavorites) {
+        items = items.filter((item) => favorites.includes(item.id));
+      }
+      if (searchTerm) {
+        items = items.filter(item =>
+          (item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchTerm))) ||
+          (item.desc && item.desc.toLowerCase().includes(searchTerm))
+        );
+      }
+
+      const countEl = document.getElementById('resultCount');
+      if (countEl) countEl.textContent = `${items.length} posts`;
+
+      if (items.length === 0) {
+        gallery.innerHTML = `<p class="text-gray-500 col-span-full text-center py-12">No media found matching your active queries.</p>`;
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const pageItems = items.slice(start, end);
+
+      pageItems.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = "bg-zinc-900 rounded-3xl overflow-hidden border border-purple-900/30 cursor-pointer hover:border-purple-500 transition flex flex-col justify-between relative group shadow-lg";
+
+        const isVideo = item.url.includes("data:video/") || item.url.toLowerCase().endsWith('.mp4') || item.url.toLowerCase().endsWith('.webm');
+
+        let mediaHTML = !isVideo
+          ? `<img src="${item.url}" class="w-full h-64 object-cover" onerror="this.src='fallback.jpg'">`
+          : `<video src="${item.url}" class="w-full h-64 object-cover" muted></video>`;
+
+        let adminBadgeHTML = isAdmin() 
+          ? `<button onclick="deletePost(${item.id}, event)" class="absolute top-4 right-4 z-20 bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-md transition transform hover:scale-110"><i class="fa-solid fa-trash-can text-sm"></i></button>` 
+          : '';
+
+        card.innerHTML = `
+          ${adminBadgeHTML}
+          ${mediaHTML}
+          <div class="p-4 flex-grow flex flex-col justify-between bg-zinc-950/20">
+            <p class="text-gray-300 text-sm line-clamp-2 mb-3">${item.desc || 'No description'}</p>
+            <div class="flex justify-between items-center text-sm pt-2 border-t border-purple-950/50">
+              <div class="flex flex-wrap gap-1 max-w-[70%]">
+                ${(item.tags || []).slice(0, 2).map(tag => `<span class="tag">${tag}</span>`).join('')}
+                ${(item.tags || []).length > 2 ? '<span class="text-xs text-purple-400 self-center">...</span>' : ''}
+              </div>
+              <div class="flex gap-3 text-gray-400">
+                <span class="flex items-center gap-1"><i class="fa-solid fa-heart text-red-500"></i> ${item.likes || 0}</span>
+                ${favorites.includes(item.id) ? '<i class="fa-solid fa-star text-yellow-400"></i>' : ''}
+              </div>
+            </div>
+          </div>
+        `;
+
+        card.onclick = () => openPostModal(item.id);
+        gallery.appendChild(card);
+      });
+
+      renderPagination(page, items.length);
+    }
+
+    function renderPagination(currentPage, totalItems) {
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+      const pagination = document.getElementById('pagination');
+      if (!pagination) return;
+      pagination.innerHTML = '';
+      if (totalPages <= 1) return;
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = `px-5 py-2 rounded-full font-semibold transition cursor-pointer ${i === currentPage ? 'bg-purple-600 text-white' : 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-white'}`;
+        btn.textContent = i;
+        btn.onclick = () => renderGallery(i);
+        pagination.appendChild(btn);
+      }
+    }
+
+    function openPostModal(id) {
+      currentPostId = id;
+      const item = ALL_MEDIA_REGISTRY.find(u => u.id === id);
+      if (!item) return;
+      
+      document.getElementById('postModal').classList.remove('hidden');
+      document.getElementById('postModal').classList.add('flex');
+      document.getElementById('modalTitle').textContent = item.desc ? item.desc.substring(0, 30) + (item.desc.length > 30 ? '...' : '') : 'Post View';
+      
+      const isVideo = item.url.includes("data:video/") || item.url.toLowerCase().endsWith('.mp4') || item.url.toLowerCase().endsWith('.webm');
+
+      let mediaHTML = !isVideo
+        ? `<img src="${item.url}" class="max-w-full max-h-[50vh] rounded-2xl object-contain" onerror="this.src='fallback.jpg'">`
+        : `<video src="${item.url}" controls class="max-w-full max-h-[50vh] rounded-2xl"></video>`;
+      
+      document.getElementById('modalMedia').innerHTML = mediaHTML;
+
+      const tagsContainer = document.getElementById('modalTagsContainer');
+      tagsContainer.innerHTML = (item.tags || []).length > 0
+        ? (item.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')
+        : `<span class="text-sm text-gray-500">No tags listed</span>`;
+
+      document.getElementById('likeCount').textContent = item.likes || 0;
+      const favIcon = document.getElementById('favIcon');
+      favIcon.className = favorites.includes(id) ? "fa-solid fa-star text-yellow-400" : "fa-solid fa-star text-gray-500";
+
+      renderComments();
+    }
+
+    function closePostModal() {
+      document.getElementById('postModal').classList.add('hidden');
+      document.getElementById('postModal').classList.remove('flex');
+      renderGallery();
+    }
+
+    function toggleLike() {
+      if (currentPostId === null) return;
+      const item = ALL_MEDIA_REGISTRY.find(u => u.id === currentPostId);
+      if (!item) return;
+
+      item.likes = (item.likes || 0) + 1;
+      document.getElementById('likeCount').textContent = item.likes;
+      savePostState(item);
+    }
+
+    function toggleFavorite() {
+      if (currentPostId === null) return;
+      const favIcon = document.getElementById('favIcon');
+      
+      if (favorites.includes(currentPostId)) {
+        favorites = favorites.filter(id => id !== currentPostId);
+        favIcon.className = "fa-solid fa-star text-gray-500";
+      } else {
+        favorites.push(currentPostId);
+        favIcon.className = "fa-solid fa-star text-yellow-400";
+      }
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+    }
+
+    function renderComments() {
+      const container = document.getElementById('commentsSection');
+      const item = ALL_MEDIA_REGISTRY.find(u => u.id === currentPostId);
+      if (!item) return;
+
+      container.innerHTML = '';
+      if (!item.comments || item.comments.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 text-sm italic">No entries yet. Claim space below...</p>`;
+        return;
+      }
+      
+      item.comments.forEach(comment => {
+        let cObj = {};
+        if (typeof comment === 'string') {
+          cObj = { id: Date.now() + Math.random(), text: comment, author: "sub", upvotes: 0, downvotes: 0 };
+        } else if (comment && typeof comment === 'object') {
+          cObj = {
+            id: comment.id || Date.now() + Math.random(),
+            text: comment.text || "",
+            author: comment.author || "sub",
+            upvotes: typeof comment.upvotes === 'number' ? comment.upvotes : 0,
+            downvotes: typeof comment.downvotes === 'number' ? comment.downvotes : 0
+          };
+        } else {
+          return;
+        }
+
+        const div = document.createElement('div');
+        div.className = "bg-zinc-800/60 p-4 rounded-2xl border border-zinc-700/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3";
+        
+        let adminDeleteCommentBtn = isAdmin()
+          ? `<button onclick="deleteComment(${cObj.id})" class="text-red-500 hover:text-red-400 text-xs px-2 py-1 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition flex items-center gap-1 cursor-pointer"><i class="fa-solid fa-trash"></i> Delete</button>`
+          : '';
+
+        div.innerHTML = `
+          <div class="flex-1">
+            <p class="text-sm text-gray-200"><span class="text-purple-400 font-bold">@${cObj.author}</span>: ${cObj.text}</p>
+          </div>
+          <div class="flex items-center gap-2 self-end sm:self-auto">
+            ${adminDeleteCommentBtn}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function addComment() {
+      const input = document.getElementById('commentInput');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const item = ALL_MEDIA_REGISTRY.find(u => u.id === currentPostId);
+      if (!item) return;
+
+      if (!item.comments) item.comments = [];
+      
+      const authorName = currentUser ? currentUser.username : "sub";
+      item.comments.push({
+        id: Date.now() + Math.random(),
+        text: val,
+        author: authorName,
+        upvotes: 0,
+        downvotes: 0
+      });
+
+      input.value = '';
+      savePostState(item);
+      renderComments();
+    }
+
+    function deleteComment(commentId) {
+      if (!confirm("Remove this comment?")) return;
+      const item = ALL_MEDIA_REGISTRY.find(u => u.id === currentPostId);
+      if (!item || !item.comments) return;
+
+      item.comments = item.comments.filter(c => {
+        if (typeof c === 'object' && c.id === commentId) return false;
+        return true;
+      });
+
+      savePostState(item);
+      renderComments();
+    }
+  </script>
+</body>
+</html>
